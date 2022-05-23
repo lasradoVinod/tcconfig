@@ -1,0 +1,156 @@
+{
+    "plan2" : {
+        "conditions" : {
+            "0": {
+                "lo": {
+                    "outgoing": {
+                        "dst-port=50051, protocol=ip": {
+                            "delay": "44ms",
+                            "loss": "0%",
+                            "rate": "1000Mbps"
+                        }
+                    },
+                    "incoming": {
+                        "src-port=50051, protocol=ip": {
+                            "delay": "44ms",
+                            "loss": "0%",
+                            "rate": "1000Mbps"
+                        }
+                    }
+                }
+            },
+            "0.1": {
+                "lo": {
+                    "outgoing": {
+                        "dst-port=50051, protocol=ip": {
+                            "delay": "44ms",
+                            "loss": "0.1%",
+                            "rate": "1000Mbps"
+                        }
+                    },
+                    "incoming": {
+                        "src-port=50051, protocol=ip": {
+                            "delay": "44ms",
+                            "loss": "0.1%",
+                            "rate": "1000Mbps"
+                        }
+                    }
+                }
+            },
+            "1": {
+                "lo": {
+                    "outgoing": {
+                        "dst-port=50051, protocol=ip": {
+                            "delay": "44ms",
+                            "loss": "1%",
+                            "rate": "1000Mbps"
+                        }
+                    },
+                    "incoming": {
+                        "src-port=50051, protocol=ip": {
+                            "delay": "44ms",
+                            "loss": "1%",
+                            "rate": "1000Mbps"
+                        }
+                    }
+                }
+            },
+            "2": {
+                "lo": {
+                    "outgoing": {
+                        "dst-port=50051, protocol=ip": {
+                            "delay": "44ms",
+                            "loss": "2%",
+                            "rate": "1000Mbps"
+                        }
+                    },
+                    "incoming": {
+                        "src-port=50051, protocol=ip": {
+                            "delay": "44ms",
+                            "loss": "2%",
+                            "rate": "1000Mbps"
+                        }
+                    }
+                }
+            },
+            "5": {
+                "lo": {
+                    "outgoing": {
+                        "dst-port=50051, protocol=ip": {
+                            "delay": "44ms",
+                            "loss": "5%",
+                            "rate": "1000Mbps"
+                        }
+                    },
+                    "incoming": {
+                        "src-port=50051, protocol=ip": {
+                            "delay": "44ms",
+                            "loss": "5%",
+                            "rate": "1000Mbps"
+                        }
+                    }
+                }
+            },
+            "10": {
+                "lo": {
+                    "outgoing": {
+                        "dst-port=50051, protocol=ip": {
+                            "delay": "44ms",
+                            "loss": "10%",
+                            "rate": "1000Mbps"
+                        }
+                    },
+                    "incoming": {
+                        "src-port=50051, protocol=ip": {
+                            "delay": "44ms",
+                            "loss": "10%",
+                            "rate": "1000Mbps"
+                        }
+                    }
+                }
+            } ,
+            "20": {
+                "lo": {
+                    "outgoing": {
+                        "dst-port=50051, protocol=ip": {
+                            "delay": "44ms",
+                            "loss": "20%",
+                            "rate": "1000Mbps"
+                        }
+                    },
+                    "incoming": {
+                        "src-port=50051, protocol=ip": {
+                            "delay": "44ms",
+                            "loss": "20%",
+                            "rate": "1000Mbps"
+                        }
+                    }
+                }
+            },
+            "50": {
+                "lo": {
+                    "outgoing": {
+                        "dst-port=50051, protocol=ip": {
+                            "delay": "44ms",
+                            "loss": "50%",
+                            "rate": "1000Mbps"
+                        }
+                    },
+                    "incoming": {
+                        "src-port=50051, protocol=ip": {
+                            "delay": "44ms",
+                            "loss": "50%",
+                            "rate": "1000Mbps"
+                        }
+                    }
+                }
+            } 
+        },
+        "timing" : {
+            "a" : {"0" : "10s"},
+            "b" : {"0.1" : "10s"},
+            "c" : {"0" : "10s"},
+            "d" : {"1" : "10s"}
+        }
+    }
+}

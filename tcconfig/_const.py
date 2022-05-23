@@ -34,9 +34,9 @@ class ShapingAlgorithm:
 
 class Tc:
     class Command:
-        TCSET = "tcset"
-        TCDEL = "tcdel"
-        TCSHOW = "tcshow"
+        TCSET = "python cli_tcset.py"
+        TCDEL = "python cli_tcdel.py"
+        TCSHOW = "python cli_tcshow.py"
 
     class Param:
         DEVICE = "device"

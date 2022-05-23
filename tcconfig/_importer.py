@@ -28,6 +28,7 @@ class TcConfigLoader:
         self.__logger = logger
         self.__config_table = None
         self.is_overwrite = False
+        self.is_change = False
         self.tc_command_output = TcCommandOutput.NOT_SET
 
     def load_tcconfig(self, config_file_path):
@@ -118,8 +119,11 @@ class TcConfigLoader:
                     except pp.ParseException:
                         pass
 
-                    if not is_first_set:
+                    if not is_first_set and not self.is_change:
                         option_list.append("--add")
+                    
+                    if self.is_change:
+                        option_list.append("--change")
 
                     if self.tc_command_output == TcCommandOutput.STDOUT:
                         option_list.append("--tc-command")
@@ -129,7 +133,6 @@ class TcConfigLoader:
                     is_first_set = False
 
                     command_list.append(" ".join([Tc.Command.TCSET] + option_list))
-
         return command_list
 
     @staticmethod
@@ -162,13 +165,13 @@ class TcConfigLoader:
 
 
 def set_tc_from_file(
-    logger, config_file_path: str, is_overwrite: bool, tc_command_output: Optional[str]
-) -> int:
+    logger, config_file_path: str, is_overwrite: bool, tc_command_output: Optional[str], is_change = False) -> int:
     return_code = 0
 
     loader = TcConfigLoader(logger)
     loader.is_overwrite = is_overwrite
     loader.tc_command_output = tc_command_output
+    loader.is_change = is_change
 
     try:
         loader.load_tcconfig(config_file_path)

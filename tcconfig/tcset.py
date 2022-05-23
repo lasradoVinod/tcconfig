@@ -358,7 +358,7 @@ def main():
 
     if options.import_setting:
         return set_tc_from_file(
-            logger, options.device, options.overwrite, options.tc_command_output
+            logger, options.device, options.overwrite, options.tc_command_output, options.is_change_shaping_rule
         )
 
     spr.SubprocessRunner.clear_history()

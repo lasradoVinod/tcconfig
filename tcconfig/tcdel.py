@@ -7,6 +7,7 @@
 
 import errno
 import sys
+from tkinter import N
 
 import subprocrunner as spr
 
@@ -23,7 +24,7 @@ from .parser._model import Filter
 from .traffic_control import TrafficControl
 
 
-def parse_option():
+def parse_option(args=None):
     parser = ArgparseWrapper(__version__)
 
     group = parser.parser.add_argument_group("Traffic Control")
@@ -51,7 +52,10 @@ def parse_option():
     parser.add_routing_group()
     parser.add_docker_group()
 
-    return parser.parser.parse_args()
+    if (args is None):
+        return parser.parser.parse_args()
+    else:
+        return parser.parser.parse_args(args)
 
 
 class TcDelMain(Main):
@@ -122,8 +126,9 @@ class TcDelMain(Main):
         )
 
 
-def main():
-    options = parse_option()
+def main(args=None):
+
+    options = parse_option(args)
 
     initialize_cli(options)
 
