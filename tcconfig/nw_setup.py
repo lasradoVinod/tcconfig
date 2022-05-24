@@ -53,7 +53,7 @@ class NWSetup ():
         from voluptuous import ALLOW_EXTRA, Any, Required, Schema
 
         schema = Schema(
-            {Required(str): { "conditions": {Required(str):{Any(*TrafficDirection.LIST): {str: {str: Any(str, int, float)}}}}},"timing":{int:{str:str}}},
+            {Required(str): { "conditions": {Required(str):{Any(*TrafficDirection.LIST): {str: {str: Any(str, int, float)}}}}},"timing":[{str:str}]},
             extra=ALLOW_EXTRA,
         )
 
@@ -71,8 +71,8 @@ class NWSetup ():
         set_tc_from_file(logger,filename,False, TcCommandOutput.NOT_SET,True)
         loop = asyncio.get_running_loop()
         timing = hr.Time(timing, hr.Time.Unit.SECOND).seconds
-        key_list = sorted(plan_table["timing"].keys())
-        idx_new = key_list[(key_list.index(idx)+1) % len(key_list)]
+        idx_new = (idx+1) % len(plan_table["timing"])
+
         if (not loop_forever) and idx_new < idx:
             delmain(["lo", "--all"])
             exit()
@@ -83,8 +83,7 @@ class NWSetup ():
         for plan, plan_table in self.__config_table.items():
             if plan_table is None:
                 continue
-            base_plan_idx = sorted(plan_table["timing"].keys())[0]
-            self.__event_loop.call_soon(self.event_handler,plan,base_plan_idx,plan_table,loop_forever)
+            self.__event_loop.call_soon(self.event_handler,plan,0,plan_table,loop_forever)
 
         self.__event_loop.run_forever()
 
