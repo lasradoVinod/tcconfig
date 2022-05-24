@@ -27,7 +27,7 @@ def parse_option():
             epilog=dedent(
                 """\
                 tcconfig: https://tcconfig.rtfd.io/
-                Documentation: https://docs.google.com/document/d/15WIX_6HV-y5PIF8B4cvZwLTgplHVo_xs_Tl7pyV6JZE/edit
+                Documentation: go/network-emulation-tc-wrapper
                 """
             ),
         )
@@ -44,10 +44,13 @@ class NWSetup ():
         signal.signal(signal.SIGINT, self.signal_handler)
         return
     
-    def signal_handler (self, sig, frame):
+    def setup_exit(self):
         self.__event_loop.stop()
         delmain(["lo", "--all"])
         exit()
+    
+    def signal_handler (self, sig, frame):
+        self.setup_exit()
 
     def parse(self,config_file):
         from voluptuous import ALLOW_EXTRA, Any, Required, Schema
@@ -64,6 +67,9 @@ class NWSetup ():
         
     def event_handler(self,plan_name, idx, plan_table,loop_forever):
         plan_id, timing = next(iter(plan_table["timing"][idx].items()))
+        if not plan_id in plan_table["conditions"]:
+            print ("{} not a condition in plan {}".format(plan_id,plan_name))
+            self.setup_exit()
         print ("{}, {}".format(int(time.time()*1000), plan_id))
         filename = '/tmp/data' + plan_name + plan_id+'.json'
         with open(filename, 'w') as f:
@@ -74,8 +80,7 @@ class NWSetup ():
         idx_new = (idx+1) % len(plan_table["timing"])
 
         if (not loop_forever) and idx_new < idx:
-            delmain(["lo", "--all"])
-            exit()
+            self.setup_exit()
         loop.call_later(timing,self.event_handler,plan_name,idx_new,plan_table,loop_forever)
 
 
