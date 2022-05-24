@@ -1,6 +1,7 @@
 allpairspy
 DataProperty
-docker_py
+msgfy
+docker
 humanreadable
 loguru
 msgfy
