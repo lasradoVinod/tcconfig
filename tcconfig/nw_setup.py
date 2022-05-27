@@ -1,7 +1,7 @@
 from email.mime import base
 from re import T
 import signal
-import re
+import os
 import sys
 import json 
 import msgfy
@@ -42,11 +42,15 @@ class NWSetup ():
     def __init__ (self, options):
         self.__event_loop = asyncio.get_event_loop()
         signal.signal(signal.SIGINT, self.signal_handler)
+        self.__file_set = set()
+        self.__pid = os.getpid()
         return
     
     def setup_exit(self):
         self.__event_loop.stop()
         delmain(["lo", "--all"])
+        for file in self.__file_set:
+            os.remove(file)
         exit()
     
     def signal_handler (self, sig, frame):
@@ -71,9 +75,10 @@ class NWSetup ():
             print ("{} not a condition in plan {}".format(plan_id,plan_name))
             self.setup_exit()
         print ("{}, {}".format(int(time.time()*1000), plan_id))
-        filename = '/tmp/data' + plan_name + plan_id+'.json'
+        filename = '/tmp/data{}{}{}.json'.format(self.__pid,plan_name,plan_id)
         with open(filename, 'w') as f:
             json.dump(plan_table["conditions"][plan_id], f)
+        self.__file_set.add(filename)
         set_tc_from_file(logger,filename,False, TcCommandOutput.NOT_SET,True)
         loop = asyncio.get_running_loop()
         timing = hr.Time(timing, hr.Time.Unit.SECOND).seconds

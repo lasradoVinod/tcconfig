@@ -31,6 +31,9 @@ ${DIST_DIR_PATH}/tcdel --help
 pyinstaller cli_tcshow.py --clean --onefile --distpath $DIST_DIR_PATH --name tcshow
 ${DIST_DIR_PATH}/tcshow --help
 
+pyinstaller cli_nw_setup.py --clean --onefile --distpath $DIST_DIR_PATH --name tc_nw_setup
+${DIST_DIR_PATH}/tc_nw_setup --help
+
 
 # build a deb package
 MACHINE=$(python -c "import platform; print(platform.machine().casefold())")
