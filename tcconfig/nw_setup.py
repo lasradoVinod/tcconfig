@@ -43,12 +43,15 @@ class NWSetup ():
         self.__event_loop = asyncio.get_event_loop()
         signal.signal(signal.SIGINT, self.signal_handler)
         self.__file_set = set()
+        self.__intf = set()
         self.__pid = os.getpid()
         return
     
     def setup_exit(self):
         self.__event_loop.stop()
-        delmain(["lo", "--all"])
+
+        for intf in self.__intf:
+            delmain([intf, "--all"])
         for file in self.__file_set:
             os.remove(file)
         exit()
@@ -79,13 +82,15 @@ class NWSetup ():
         with open(filename, 'w') as f:
             json.dump(plan_table["conditions"][plan_id], f)
         self.__file_set.add(filename)
+        for key in plan_table["conditions"][plan_id].keys():
+            self.__intf.add(key)
         set_tc_from_file(logger,filename,False, TcCommandOutput.NOT_SET,True)
         loop = asyncio.get_running_loop()
         timing = hr.Time(timing, hr.Time.Unit.SECOND).seconds
         idx_new = (idx+1) % len(plan_table["timing"])
 
         if (not loop_forever) and idx_new < idx:
-            self.setup_exit()
+            self.setup_exit(plan_table)
         loop.call_later(timing,self.event_handler,plan_name,idx_new,plan_table,loop_forever)
 
 
