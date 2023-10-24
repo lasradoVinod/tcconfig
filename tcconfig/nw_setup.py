@@ -35,6 +35,7 @@ def parse_option():
     parser.add_argument("config_file", nargs="?", help="Path to config file")
     parser.add_argument("--loop_forever",help="Continue cycling through the conditions",action="store_true",default=False,required=False)
     parser.add_argument("--export-log", dest="export_path", help="export debug logs to file", default = "", required=False)
+    parser.add_argument("--nw_log", dest="nw_log", help="File to output nw condition change logs.", default = "", required=False)
 
     return parser.parse_args()
 
@@ -45,6 +46,8 @@ class NWSetup ():
         self.__file_set = set()
         self.__intf = set()
         self.__pid = os.getpid()
+        if options.nw_log !=  "":
+            self.__log_file = open(options.nw_log,"w")
         return
     
     def setup_exit(self):
@@ -52,9 +55,13 @@ class NWSetup ():
 
         for intf in self.__intf:
             delmain([intf, "--all"])
+        print ("{}, {}".format(int(time.time()*1000), "stop"))
+        if self.__log_file:
+            self.__log_file.write("{}, {}\n".format(int(time.time()*1000), "stop"))
+        
         for file in self.__file_set:
             os.remove(file)
-        exit()
+        sys.exit()
     
     def signal_handler (self, sig, frame):
         self.setup_exit()
@@ -72,33 +79,43 @@ class NWSetup ():
 
         schema(self.__config_table)
         
-    def event_handler(self,plan_name, idx, plan_table,loop_forever):
+    def event_handler(self,plan_name, idx, plan_table,loop_forever,exit):
+        if exit == True:
+            self.setup_exit()
+        
         plan_id, timing = next(iter(plan_table["timing"][idx].items()))
         if not plan_id in plan_table["conditions"]:
             print ("{} not a condition in plan {}".format(plan_id,plan_name))
             self.setup_exit()
         print ("{}, {}".format(int(time.time()*1000), plan_id))
+        if self.__log_file:
+            self.__log_file.write("{}, {}\n".format(int(time.time()*1000), plan_id))
+
         filename = '/tmp/data{}{}{}.json'.format(self.__pid,plan_name,plan_id)
         with open(filename, 'w') as f:
             json.dump(plan_table["conditions"][plan_id], f)
         self.__file_set.add(filename)
         for key in plan_table["conditions"][plan_id].keys():
             self.__intf.add(key)
-        set_tc_from_file(logger,filename,False, TcCommandOutput.NOT_SET,True)
+        error_code = set_tc_from_file(logger,filename,False, TcCommandOutput.NOT_SET,True)
+        if error_code != 0:
+            print("Setting tc errored: probably needs sudo")
+            self.setup_exit()
         loop = asyncio.get_running_loop()
         timing = hr.Time(timing, hr.Time.Unit.SECOND).seconds
         idx_new = (idx+1) % len(plan_table["timing"])
 
         if (not loop_forever) and idx_new < idx:
-            self.setup_exit(plan_table)
-        loop.call_later(timing,self.event_handler,plan_name,idx_new,plan_table,loop_forever)
+            exit = True
+        
+        loop.call_later(timing,self.event_handler,plan_name,idx_new,plan_table,loop_forever,exit)
 
 
     def run(self, loop_forever=bool):
         for plan, plan_table in self.__config_table.items():
             if plan_table is None:
                 continue
-            self.__event_loop.call_soon(self.event_handler,plan,0,plan_table,loop_forever)
+            self.__event_loop.call_soon(self.event_handler,plan,0,plan_table,loop_forever,False)
 
         self.__event_loop.run_forever()
 
